@@ -86,6 +86,33 @@ class FormHelper {
     return implode(' ', $tmp);
   }
 
-  
+  protected function options($name, $options) {
+    $tmp = array();
+    foreach ($options as $k => $v) {
+      $s = "<option value = \"{$this->encode($k)}\"";
+      if ($this->isOptionSelected($name, $k)) {
+        $s .= ' selected';
+      }
+      $s .= ">{$this->encode($v)}</options>";
+      $tmp = $s;
+    }
+    return implode(' ', $tmp);
+  }
 
+  protected function isOptionSelected($name, $value) {
+    // 値配列に$nameのエントリがなければ、このオプションは選択できない
+    if (! isset($this->values[$name])) {
+      return false;
+      // 値配列の$nameのエントリが配列の場合、$valueがその配列にあるかどうか調べる
+    } else if(is_array($this->values[$name])) {
+      return in_array($value, $this->values[$name]);
+    } else {
+      // それ以外ならば$valuesと値配列の$nameのエントリを比較する
+      return $value == $this->values[$name];
+    }
+  }
+
+  public function encode($s) {
+    return htmlentities($s);
+  }
 }
