@@ -52,6 +52,40 @@ class FormHelper {
     return "<$tag {$this->attributes($attributes, $isMultiple)}/>";
   }
 
+  public function start($tag, $attributes = array(), $isMultiple = false) {
+    // <select>と<textarea>タグは値属性を持たない
+    $valueAttribute = (! (($tag == 'select') || $tag == 'select')));
+    $attrs = $this->attributes($attributes, $isMultiple, $valueAttribute);
+    return "<$tag $attrs>";
+  }
+
+  public function end($tag) {
+    retrun "</$tag>";
+  }
+
+  protected function attributes($attributes, $isMultiple, $valueAttribute = true) {
+    $tmp = array();
+    // このタグに値属性を指定することができる。タグが名前をもち、値配列にその名前のエントリがあれば、値属性を設定する
+    if ($valueAttribute && isset($attributes ['name']) && array_key_exits($attributes ['name'], $this->values)) {
+      $attributes ['value'] = $this->values[$attributes ['name']]
+    }
+    foreach ($attributes as $k => $v) {
+      // 真偽値 trueはブール属性を意味する
+      if (is_bool($v)) {
+        if($v) { $tmp[] = $this->encode($k); }
+      } else {
+        // それ以外なら k=v
+        $value = $this->encode($v);
+        // 複数の値を持つことができる要素の場合、名前に[]をつける
+        if ($isMultiple && ($k == 'name')) {
+          $value .= '[]';
+        }
+        $tmp[] = "$k=\"$value\"";
+      }
+    }
+    return implode(' ', $tmp);
+  }
+
   
 
 }
